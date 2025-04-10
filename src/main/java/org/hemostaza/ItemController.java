@@ -94,7 +94,7 @@ public class ItemController {
         } catch (SQLException e) {
             return false;
         }
-        System.out.println("\n");
+        System.out.println("Nazwa | Data księgowania | koszt USD | koszt PLN");
         for (Item item : list) {
             System.out.println(item);
         }
@@ -134,6 +134,7 @@ public class ItemController {
             System.out.println("Problem z bazą danych");
             return false;
         }
+        System.out.println("Nazwa | Data księgowania | koszt USD | koszt PLN");
         for (Item item : list) {
             System.out.println(item);
         }
