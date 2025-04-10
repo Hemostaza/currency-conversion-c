@@ -28,7 +28,7 @@ public class ExchangeController {
 
         int responseCode = connection.getResponseCode();
         if (responseCode == 404) {
-            throw new Exception("Dane nie są dostępne dla podanej daty. Kursy są publikowane w dni robocze.");
+            throw new Exception("Dane nie są dostępne dla podanej daty.");
         } else if (responseCode != 200) {
             throw new Exception("Nie udało się pobrać kursu. Kod błędu: " + responseCode);
         }
@@ -49,36 +49,6 @@ public class ExchangeController {
         //System.out.println(Double.parseDouble(String.valueOf(rate.get("mid"))));
         return Double.parseDouble(String.valueOf(rate.get("mid")));
 
-    }
-
-    public double getMidRate(String date) throws Exception {
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        LocalDate wantedDate = LocalDate.parse(date);
-        LocalDate prev = wantedDate.minusDays(3);
-        LocalDate next = wantedDate.plusDays(3);
-
-        URL url = new URI(API_URL + prev + "/"+next + "?format=json").toURL();
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.connect();
-
-        StringBuilder responseString = new StringBuilder();
-        Scanner scanner = new Scanner(url.openStream());
-        while (scanner.hasNext()) {
-            responseString.append(scanner.nextLine());
-        }
-        scanner.close();
-
-        int responseCode = connection.getResponseCode();
-        if (responseCode == 404) {
-            throw new Exception("Dane nie są dostępne dla podanych dat.");
-        } else if (responseCode != 200) {
-            throw new Exception("Nie udało się pobrać kursu. Kod błędu: " + responseCode);
-        }
-
-        System.out.println(responseString);
-
-        return 0.0;
     }
 
 }

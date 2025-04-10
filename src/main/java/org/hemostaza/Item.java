@@ -1,13 +1,16 @@
 package org.hemostaza;
 
+
+import java.sql.Date;
+
 public class Item {
 
     private String name;
-    private String date;
+    private Date date;
     private double usd;
     private double pln;
 
-    public Item(String name, String date, double usd, double pln) {
+    public Item(String name, Date date, double usd, double pln) {
         this.name = name;
         this.date = date;
         this.usd = usd;
@@ -18,7 +21,7 @@ public class Item {
         return name;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
@@ -32,5 +35,10 @@ public class Item {
 
     public void setPln(double rate){
         pln = usd * rate;
+    }
+
+    @Override
+    public String toString() {
+        return name+" | "+date+" | "+usd+" USD | "+pln+" PLN";
     }
 }

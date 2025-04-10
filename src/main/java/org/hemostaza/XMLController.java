@@ -15,8 +15,10 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class XMLController {
     public void saveToXml(List<Item> addedItems,String xmlName) throws ParserConfigurationException, TransformerException {
@@ -38,7 +40,7 @@ public class XMLController {
             record.appendChild(name);
 
             Element date = doc.createElement("data_ksiegowania");
-            date.appendChild(doc.createTextNode(item.getDate()));
+            date.appendChild(doc.createTextNode(String.valueOf(item.getDate())));
             record.appendChild(date);
 
             Element usdValue = doc.createElement("koszt_USD");
@@ -88,7 +90,12 @@ public class XMLController {
                 String date = element.getElementsByTagName("data_ksiegowania").item(0).getTextContent();
                 String usd = element.getElementsByTagName("koszt_USD").item(0).getTextContent();
                 String pln = element.getElementsByTagName("koszt_PLN").item(0).getTextContent();
-                Item item = new Item(name,date,Double.parseDouble(usd),Double.parseDouble(pln));
+
+                if(pln.isBlank()){
+                    pln = "0";
+                }
+
+                Item item = new Item(name, Date.valueOf(date),Double.parseDouble(usd),Double.parseDouble(pln));
                 itemsList.add(item);
 
             }
