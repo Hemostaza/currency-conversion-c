@@ -3,16 +3,7 @@ package org.hemostaza;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Scanner;
 
 public class ExchangeController {

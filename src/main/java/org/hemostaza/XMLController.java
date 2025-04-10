@@ -1,6 +1,5 @@
 package org.hemostaza;
 
-import org.h2.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -18,7 +17,6 @@ import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class XMLController {
     public void saveToXml(List<Item> addedItems,String xmlName) throws ParserConfigurationException, TransformerException {
