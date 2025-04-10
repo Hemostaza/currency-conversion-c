@@ -1,16 +1,16 @@
 package org.hemostaza;
 
 
+import java.math.BigDecimal;
 import java.sql.Date;
 
 public class Item {
-
     private String name;
     private Date date;
-    private double usd;
-    private double pln;
+    private BigDecimal usd;
+    private BigDecimal pln;
 
-    public Item(String name, Date date, double usd, double pln) {
+    public Item(String name, Date date, BigDecimal usd, BigDecimal pln) {
         this.name = name;
         this.date = date;
         this.usd = usd;
@@ -25,16 +25,12 @@ public class Item {
         return date;
     }
 
-    public double getUsd() {
+    public BigDecimal getUsd() {
         return usd;
     }
 
-    public double getPln() {
+    public BigDecimal getPln() {
         return pln;
-    }
-
-    public void setPln(double rate){
-        pln = usd * rate;
     }
 
     @Override

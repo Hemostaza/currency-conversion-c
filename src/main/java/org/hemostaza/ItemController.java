@@ -1,12 +1,20 @@
 package org.hemostaza;
 
+import org.xml.sax.SAXException;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -34,7 +42,8 @@ public class ItemController {
             //Sprawzamy czy data jest git
             LocalDate date;
             date = LocalDate.parse(args[2]);
-            double usd = Double.parseDouble(args[3]);
+            BigDecimal usd = new BigDecimal(args[3]).setScale(2,RoundingMode.HALF_EVEN);
+//double usd = Double.parseDouble(args[3]);
             int day = date.getDayOfWeek().getValue();
             DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             double rate = 0;
@@ -54,8 +63,14 @@ public class ItemController {
             } else {
                 rate = exchangeController.getRate(args[2]);
             }
-            double pln = usd * rate;
-            dataBaseController.saveItem(args[1], Date.valueOf(args[2]), usd, pln);
+            BigDecimal pln = usd.multiply(BigDecimal.valueOf(rate)).setScale(2,RoundingMode.HALF_EVEN);
+            //double pln = usd * rate;
+            Item item = new Item(args[1],Date.valueOf(args[2]),usd,pln);
+            //System.out.println("Dodano do dazy danych: "+item);
+            dataBaseController.saveItem(item);
+            xmlController.saveToXml(Arrays.asList(item));
+            //dataBaseController.saveItem(args[1], Date.valueOf(args[2]), usd, pln);
+
             return true;
 
         } catch (DateTimeParseException e) {
@@ -147,8 +162,8 @@ public class ItemController {
         }
         String xmlName = args[1];
         try {
-            xmlController.saveToXml(dataBaseController.getAll("nazwa","desc"),xmlName);
-        } catch (ParserConfigurationException | SQLException | TransformerException e) {
+            xmlController.exportToXml(dataBaseController.getAll("nazwa","desc"),xmlName);
+        } catch (ParserConfigurationException | SQLException | TransformerException | IOException | SAXException e) {
             return false;
         }
         return true;

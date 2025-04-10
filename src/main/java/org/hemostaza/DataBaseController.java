@@ -1,5 +1,6 @@
 package org.hemostaza;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,33 +32,21 @@ public class DataBaseController {
 
         preparedStatement.setString(1, item.getName());
         preparedStatement.setDate(2, item.getDate());
-        preparedStatement.setDouble(3, item.getUsd());
-        preparedStatement.setDouble(4, item.getPln());
+        preparedStatement.setBigDecimal(3, item.getUsd());
+        preparedStatement.setBigDecimal(4, item.getPln());
 
         preparedStatement.executeUpdate();
 
-        System.out.println("Zapisano dane do bazy danych.");
+        System.out.println("Dodano "+item+" do bazy danych.");
     }
-    public void saveItem(String name, Date date, double usd, double pln) throws SQLException {
-        String sql = "INSERT INTO items (nazwa, data_ksiegowania, koszt_USD, koszt_PLN) " +
-                "VALUES (?, ?, ?, ?)";
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-
-        preparedStatement.setString(1, name);
-        preparedStatement.setDate(2, date);
-        preparedStatement.setDouble(3, usd);
-        preparedStatement.setDouble(4, pln);
-
-        preparedStatement.executeUpdate();
-
-        System.out.println("Zapisano dane do bazy danych.");
+    public void saveItem(String name, Date date, BigDecimal usd, BigDecimal pln) throws SQLException {
+        saveItem(new Item(name,date,usd,pln));
     }
 
     public void saveMultiple(List<Item> list) throws SQLException {
         for(Item i : list){
             saveItem(i);
         }
-
     }
 
     public List<Item> getAll(String sortBy, String order) throws SQLException {
@@ -75,8 +64,8 @@ public class DataBaseController {
         while (rs.next()) {
             String name = rs.getString("nazwa");
             Date date = rs.getDate("data_ksiegowania");
-            double usd = rs.getDouble("koszt_USD");
-            double pln = rs.getDouble("koszt_PLN");
+            BigDecimal usd = rs.getBigDecimal("koszt_USD");
+            BigDecimal pln = rs.getBigDecimal("koszt_PLN");
             Item itm = new Item(name, date, usd, pln);
             itemsList.add(itm);
             //System.out.println(name+" "+date+" "+usd+" "+pln);
@@ -97,8 +86,8 @@ public class DataBaseController {
         while (rs.next()) {
             String name = rs.getString("nazwa");
             Date date = rs.getDate("data_ksiegowania");
-            double usd = rs.getDouble("koszt_USD");
-            double pln = rs.getDouble("koszt_PLN");
+            BigDecimal usd = rs.getBigDecimal("koszt_USD");
+            BigDecimal pln = rs.getBigDecimal("koszt_PLN");
             Item itm = new Item(name, date, usd, pln);
             itemsList.add(itm);
         }

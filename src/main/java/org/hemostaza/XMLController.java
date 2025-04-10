@@ -14,12 +14,26 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
 public class XMLController {
-    public void saveToXml(List<Item> addedItems,String xmlName) throws ParserConfigurationException, TransformerException {
+
+    public void saveToXml(List<Item> itemsList) throws ParserConfigurationException, IOException, TransformerException, SAXException {
+
+        List<Item> itemsInXml;
+        itemsInXml = getFromXml("Saved_records.xml");
+        if(itemsInXml==null){
+            itemsInXml=new ArrayList<>();
+        }
+        itemsInXml.addAll(itemsList);
+        exportToXml(itemsInXml, "Saved_records");
+
+    }
+
+    public void exportToXml(List<Item> addedItems, String xmlName) throws ParserConfigurationException, TransformerException, IOException, SAXException {
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -60,14 +74,24 @@ public class XMLController {
         StreamResult file = new StreamResult(new File(fileName));
 
         transformer.transform(source, file);
-        System.out.println("Zapisano dane do pliku: " + fileName);
+        System.out.println("Zapisano w pliku "+fileName);
     }
 
-    public List<Item> getFromXml(String xmlName) throws ParserConfigurationException, IOException, SAXException {
+    public List<Item> getFromXml(String xmlName) throws ParserConfigurationException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
 
-        Document doc = builder.parse(new File(xmlName));
+        File xmlFile = new File(xmlName);
+        if (!xmlFile.exists()) {
+            return null;
+        }
+
+        Document doc = null;
+        try {
+            doc = builder.parse(xmlFile);
+        } catch (SAXException e) {
+            return null;
+        }
 
         doc.getDocumentElement().normalize();
 
@@ -89,11 +113,11 @@ public class XMLController {
                 String usd = element.getElementsByTagName("koszt_USD").item(0).getTextContent();
                 String pln = element.getElementsByTagName("koszt_PLN").item(0).getTextContent();
 
-                if(pln.isBlank()){
+                if (pln.isBlank()) {
                     pln = "0";
                 }
 
-                Item item = new Item(name, Date.valueOf(date),Double.parseDouble(usd),Double.parseDouble(pln));
+                Item item = new Item(name, Date.valueOf(date), new BigDecimal(usd), new BigDecimal(pln));
                 itemsList.add(item);
 
             }
