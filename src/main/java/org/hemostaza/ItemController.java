@@ -1,22 +1,13 @@
 package org.hemostaza;
 
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class ItemController {
     DataBaseController dataBaseController;
@@ -39,15 +30,12 @@ public class ItemController {
             return false;
         }
         try {
-            //Sprawzamy czy data jest git
             LocalDate date;
             date = LocalDate.parse(args[2]);
-            BigDecimal usd = new BigDecimal(args[3]).setScale(2,RoundingMode.HALF_EVEN);
-//double usd = Double.parseDouble(args[3]);
+            BigDecimal usd = new BigDecimal(args[3]).setScale(2, RoundingMode.HALF_EVEN);
             int day = date.getDayOfWeek().getValue();
             DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             double rate = 0;
-            //Jeżeli weekend:
             if (day > 5) {
                 int daychange = day - 5;
                 String newDate = date.minusDays(daychange).format(sdf);
@@ -63,13 +51,10 @@ public class ItemController {
             } else {
                 rate = exchangeController.getRate(args[2]);
             }
-            BigDecimal pln = usd.multiply(BigDecimal.valueOf(rate)).setScale(2,RoundingMode.HALF_EVEN);
-            //double pln = usd * rate;
-            Item item = new Item(args[1],Date.valueOf(args[2]),usd,pln);
-            //System.out.println("Dodano do dazy danych: "+item);
+            BigDecimal pln = usd.multiply(BigDecimal.valueOf(rate)).setScale(2, RoundingMode.HALF_EVEN);
+            Item item = new Item(args[1], Date.valueOf(args[2]), usd, pln);
             dataBaseController.saveItem(item);
             xmlController.saveToXml(Arrays.asList(item));
-            //dataBaseController.saveItem(args[1], Date.valueOf(args[2]), usd, pln);
 
             return true;
 
@@ -86,91 +71,105 @@ public class ItemController {
 
     }
 
-    public boolean showAll(String[] args) {
-        List<Item> list;
+    public void showAll(String[] args) throws Exception{
         if (args.length > 1) {
-            if (!args[1].equalsIgnoreCase("sort-by")) {
-                return false;
+            if (!args[1].equalsIgnoreCase("sort-by") && !args[1].equalsIgnoreCase("sortuj-po")) {
+                throw new Exception("show-all sort-by [name/date]");
             }
         }
         String sortBy = "nazwa";
         String order = "asc";
         if (args.length > 2) {
-            if(args[2].equalsIgnoreCase("date"))
-            {
-                sortBy = "data_ksiegowania";
-            }
+            sortBy = switch (args[2].toLowerCase()) {
+                case "date","data" -> "data_ksiegowania";
+                case "name","nazwa" -> "nazwa";
+                default -> throw new Exception("sort-by only by name or date");
+            };
         }
         if (args.length > 3) {
-            order = args[3];
+            order = switch (args[3].toLowerCase()) {
+                case "asc","ros", "" -> "ASC";
+                case "desc","mal" -> "DESC";
+                default -> throw new Exception("Order of sorting is only asc or desc");
+            };
         }
-        try {
-            list = dataBaseController.getAll(sortBy, order);
-        } catch (SQLException e) {
-            return false;
-        }
-        System.out.println("Nazwa | Data księgowania | koszt USD | koszt PLN");
-        for (Item item : list) {
-            System.out.println(item);
-        }
-        return true;
+
+        showList(dataBaseController.getAll(sortBy, order));
     }
 
-    public boolean findBy(String[] args) {
-        List<Item> list;
-        String findBy = "nazwa";
+    public List<Item> findBy(String[] args) throws Exception {
+        List<Item> itemList = new ArrayList<>();
+        String findBy;
         String sortBy = "nazwa";
         String order = "desc";
         String findingPart;
 
         if (args.length < 3) {
-            return false;
+            throw new Exception("find-by name/date [name/date]");
         }
-        if (args.length > 4) {
+        if (args.length > 3) {
             if (!args[3].equalsIgnoreCase("sort-by")) {
-                return false;
+                throw new Exception("find-by name/date [name/date] sort-by name/date asc/desc");
             }
-            if(args[4].equalsIgnoreCase("date")){
-                sortBy = "data_ksiegowania";
-            }
-            //sortBy = args[4];
+            if (args.length > 4) {
+                sortBy = switch (args[4].toLowerCase()) {
+                    case "date","data" -> "data_ksiegowania";
+                    case "name","nazwa" -> "nazwa";
+                    default -> throw new Exception("sort-by only by name or date");
+                };
+            }else throw new Exception("find-by name/date [name/date] sort-by name/date asc/desc");
         }
-        if(args.length>5){
-            order = args[5];
+
+        if (args.length > 5) {
+            order = switch (args[5].toLowerCase()) {
+                case "asc","ros", "" -> "ASC";
+                case "desc","mal" -> "DESC";
+                default -> throw new Exception("Order of sorting is only asc or desc");
+            };
         }
-        if(args[1].equalsIgnoreCase("date")){
-            findBy = "data_ksiegowania";
-        }
+
+        findBy = switch (args[1].toLowerCase()) {
+            case "date","data" -> "data_ksiegowania";
+            case "name","nazwa" -> "nazwa";
+            default -> throw new Exception("find-by name/date [name/date]");
+        };
         findingPart = args[2];
 
-        try {
-            list = dataBaseController.getByName(findBy, findingPart, sortBy, order);
-        } catch (SQLException e) {
-            System.out.println("Problem z bazą danych");
-            return false;
+        itemList = dataBaseController.getByName(findBy, findingPart, sortBy, order);
+        showList(itemList);
+        return itemList;
+    }
+
+    public void showList(List<Item> itemsList) throws Exception {
+        if (itemsList == null || itemsList.isEmpty()) {
+            throw new Exception("Wynik wyszukiwania jest pusty.");
         }
         System.out.println("Nazwa | Data księgowania | koszt USD | koszt PLN");
-        for (Item item : list) {
+        for (Item item : itemsList) {
             System.out.println(item);
         }
-        return true;
     }
 
-    public boolean saveToXml(String[] args){
-        if(args.length<2){
-            return false;
+    public void exportToXml(String[] args) throws Exception {
+        if (args.length < 2) {
+            throw new Exception("export-xml [file-name]");
         }
         String xmlName = args[1];
-        try {
-            xmlController.exportToXml(dataBaseController.getAll("nazwa","desc"),xmlName);
-        } catch (ParserConfigurationException | SQLException | TransformerException | IOException | SAXException e) {
-            return false;
+        List<Item> itemList;
+        if(args.length>2){
+            if(args[2].equalsIgnoreCase("find-by")){
+                String[] newArgs = Arrays.copyOfRange(args,2,args.length);
+                itemList = findBy(newArgs);
+                xmlController.exportToXml(itemList,xmlName);
+            }else throw new Exception("export-xml [file-name] find-by name/date [name/date]");
+        }else{
+            itemList = dataBaseController.getAll("nazwa","asc");
+            xmlController.exportToXml(itemList,xmlName);
         }
-        return true;
     }
 
-    public boolean insertXml(String[] args){
-        if(args.length<2){
+    public boolean insertXml(String[] args) {
+        if (args.length < 2) {
             return false;
         }
         try {
