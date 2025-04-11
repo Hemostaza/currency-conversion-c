@@ -10,11 +10,15 @@ wyświetli dane z zapisanej bazy danych w odpowiednim formacie."
 Dodaje do bazy danych rekord przyjmując nazwę [name]
 datę w formacie [RRRR-MM-DD] oraz koszt w USD [usd],
 Następnie wyświetla utworzony rekord i dodaje go do pliku Saved_records.xml
+
+W przypadku podania daty będącej weekednem program zaoferuje możliwość zapisania rekordu z kursem z najbliższego piątku.
+
 ### show-all
 Wyświetla wszystkie rekordy w bazie danych.
 Można użyć sortowania przy wyświetleniu używając dodatkowo argumentów **sort-by name/date asc/desc**
 - name/date - należy wybrać jedno do określenia względem czego ma się odbyć sortowanie
 - asc/desc - argument opcjonalny do określenia sposobu sortowania (rosnąco/malejąco)
+
 
 ### find-by name/date [search]
 Wyszukuje rekordy w bazie danych.
