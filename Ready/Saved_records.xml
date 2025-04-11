@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<faktura>
+    <komputer>
+        <nazwa>ACER Aspire</nazwa>
+        <data_ksiegowania>2025-01-03</data_ksiegowania>
+        <koszt_USD>345.00</koszt_USD>
+        <koszt_PLN>1432.16</koszt_PLN>
+    </komputer>
+    <komputer>
+        <nazwa>DELL Latitude</nazwa>
+        <data_ksiegowania>2025-01-10</data_ksiegowania>
+        <koszt_USD>543.00</koszt_USD>
+        <koszt_PLN>2248.83</koszt_PLN>
+    </komputer>
+    <komputer>
+        <nazwa>HP Victus</nazwa>
+        <data_ksiegowania>2025-01-19</data_ksiegowania>
+        <koszt_USD>346.00</koszt_USD>
+        <koszt_PLN>1434.59</koszt_PLN>
+    </komputer>
+</faktura>

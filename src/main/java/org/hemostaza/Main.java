@@ -58,7 +58,7 @@ public class Main {
         System.out.println("    Use with optional  sort-by name/date asc/desc  to sort results.");
         System.out.println("export-xml fileName");
         System.out.println("    Use to save all records from database to xml file with provided name.");
-        System.out.println("insert-xml fileName.xml");
-        System.out.println("    Use to insert items from provided xml file into database.");
+        System.out.println("    Use with optional  find-by name/date [name/date]  to saved only wanted results.");
+        System.out.println("    Use with optional  sort-by name/date asc/desc  to sort results.");
     }
 }
